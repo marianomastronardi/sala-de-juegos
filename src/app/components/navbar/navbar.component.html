@@ -1,23 +1,26 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Sala de Juegos</a>
+        <a class="navbar-brand" [routerLink]="!(token == undefined)?'/home':'/signin'">Sala de Juegos</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkupL">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkupL" *ngIf="!(token == undefined)">
             <div class="navbar-nav">
-                <a class="nav-link " routerLink="/home" routerLinkActive="active" aria-current="page">Home</a>
-                <a class="nav-link" routerLink="/quien-soy" routerLinkActive="active">Quien Soy</a>
+                <a class="nav-link " [routerLink]="'/home'" routerLinkActive="active" aria-current="page">Home</a>
+                <a class="nav-link" [routerLink]="'/quien-soy'" routerLinkActive="active">Quien Soy</a>
                 <!-- <a class="nav-link" [routerLink]="home"  [routerLinkActive]="active">Pricing</a> -->
                 <!-- <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> -->
             </div>
         </div>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkupR">
-            <div class="navbar-nav">
-                <a class="nav-link " routerLink="/signin" routerLinkActive="active">SignIn</a>
-                <a class="nav-link" routerLink="/signup" routerLinkActive="active">Sign Up</a>
+            <div class="navbar-nav" *ngIf="token == undefined">
+                <a class="nav-link " [routerLink]="'/signin'" routerLinkActive="active">Sign In</a>
+                <a class="nav-link" [routerLink]="'/signup'" routerLinkActive="active">Sign Up</a>
                 <!-- <a class="nav-link" [routerLink]="home"  [routerLinkActive]="active">Pricing</a> -->
                 <!-- <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> -->
+            </div>
+            <div class="navbar-nav" *ngIf="!(token == undefined)">
+                <a class="nav-link " (click)="logOut()" [routerLink]="'/signin'" routerLinkActive="active">Log Out</a>
             </div>
         </div>
     </div>

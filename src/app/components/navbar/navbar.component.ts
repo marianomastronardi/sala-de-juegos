@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Usuario } from 'src/app/models/usuario';
 
 @Component({
   selector: 'app-navbar',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor() { }
+  token:string | undefined;
+  constructor() { 
+  }
 
   ngOnInit(): void {
   }
-
+  
+  logOut(){
+    this.token = undefined;
+    Usuario.clearToken();
+  }
 }

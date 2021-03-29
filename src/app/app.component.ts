@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { Usuario } from "../app/models/usuario";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'sala-de-juegos';
+  token:string | undefined;
 }
