@@ -35,6 +35,7 @@ export class LoginComponent implements OnInit {
             if (this.usuario.email == user.data().email) {
               if (this.usuario.password == user.data().password) {
                 Usuario.setToken('Authorized');
+                this._authService.setUserAuthenticated();
                 this.route.navigate(['home'])
               } else {
                 this.isValidPassword = false;
@@ -91,6 +92,7 @@ export class LoginComponent implements OnInit {
         var user = result.user;
         // ...
         Usuario.setToken(token);
+        this._authService.setUserAuthenticated();
         this.route.navigate(['home'])
       }).catch((error) => {
         // Handle Errors here.

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,7 +10,7 @@ import { Usuario } from 'src/app/models/usuario';
 export class NavbarComponent implements OnInit {
 
   token:string | undefined;
-  constructor() { 
+  constructor(public _authService: AuthService) { 
   }
 
   ngOnInit(): void {
@@ -18,5 +19,6 @@ export class NavbarComponent implements OnInit {
   logOut(){
     this.token = undefined;
     Usuario.clearToken();
+    this._authService.setUserAuthenticated();
   }
 }

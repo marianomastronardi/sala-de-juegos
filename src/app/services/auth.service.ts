@@ -6,6 +6,7 @@ import { Usuario } from '../models/usuario';
   providedIn: 'root'
 })
 export class AuthService {
+  isAuthenticated:boolean = false;
   private dbpath: string = '/usuarios';
   usuarioRef: AngularFirestoreCollection<Usuario>;
 
@@ -23,5 +24,10 @@ export class AuthService {
 
   getToken():string | undefined{
     return localStorage.getItem('token')?.toString();
+  }
+
+  setUserAuthenticated(){
+    this.isAuthenticated = this.getToken() == undefined ? false : true;
+    console.log(this.isAuthenticated)
   }
 }

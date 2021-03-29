@@ -35,6 +35,7 @@ export class RegistroComponent implements OnInit {
         //Alta de usuario
         this._authService.create(this.usuario);
         Usuario.setToken('Authorized');
+        this._authService.setUserAuthenticated();
         this.route.navigate(['home'])
       }
   })
