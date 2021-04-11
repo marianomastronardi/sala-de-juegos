@@ -10,6 +10,7 @@ const routes: Routes = [
   {path: 'quien-soy', component: QuienSoyComponent},
   {path: 'signin', component: LoginComponent},
   {path: 'signup', component: RegistroComponent},
+  { path: 'juegos', loadChildren: () => import('./components/juegos/juegos.module').then(m => m.JuegosModule) },
   {path: '**', pathMatch: 'full', component: HomeComponent }
 ];
 

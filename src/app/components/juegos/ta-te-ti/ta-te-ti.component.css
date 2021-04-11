@@ -1,0 +1,20 @@
+tbody {
+    text-align: center;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+table {
+    padding-top: 0vh;
+    padding-bottom: 0vh;
+    padding-left: 0vh;
+    padding-right: 0vh;
+    text-align: center;
+    width: 150vh;
+}
+
+td {
+    padding: 0vh;
+    column-width: 50vh;
+}

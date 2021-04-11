@@ -1,0 +1,29 @@
+<div class="container">
+    <a class="btn btn-outline-success mt-2" [routerLink]="'/home'">Ir a Home</a><br>
+
+    <div *ngIf="sala.ready && !sala.finalizado">
+        <p><span class="badge bg-primary mb-2">Elija una opción</span></p>
+        <button class="btn btn-outline-primary m-1" [disabled]="resultado.length > 0"><img src="../../../../assets/piedra.jpg" alt="" (click)="setearJugada('piedra')"></button>
+        <button class="btn btn-outline-primary m-1" [disabled]="resultado.length > 0"><img src="../../../../assets/papel.jpg" alt="" (click)="setearJugada('papel')"></button>
+        <button class="btn btn-outline-primary m-1" [disabled]="resultado.length > 0"><img src="../../../../assets/tijera.jpg" alt="" (click)="setearJugada('tijera')"></button>
+    </div>
+
+    <div *ngIf="!sala.ready" class="mt-1">
+        <div class="alert alert-primary" role="alert">
+            Esperando rival...
+        </div>
+    </div>
+
+    <div class="spinner-border" *ngIf="sala.ready && !sala.finalizado && ((sala.jugador1.estadoJugada && !sala.jugador2.estadoJugada) || (!sala.jugador1.estadoJugada && sala.jugador2.estadoJugada))" role="status">
+        <span>Esperado la opción del jugador rival...</span>
+    </div>
+
+    <div class="alert alert-primary" *ngIf="resultado.length > 0" role="alert">
+        {{ resultado }}
+    </div>
+
+    <div *ngIf="sala.finalizado">
+        <button class="btn btn-outline-success">Volver a Jugar</button>
+    </div>
+</div>
+<app-chat-firestore juego='PiedraPapelOTijera'></app-chat-firestore>

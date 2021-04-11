@@ -1,0 +1,29 @@
+<!-- <p>Solo enviar mensaje</p>
+<input type="text" [(ngModel)]="nuevoMensaje.mensaje">
+<button (click)="EnviarMensaje()">Enviar</button>
+<app-form-subir-archivos></app-form-subir-archivos> -->
+<div class="d-flex justify-content-end position-fixed bottom-0 h-50">
+    <div class="container-child h-100 w-100">
+        <div class="card h-100">
+            <div class="card-body p-0" *ngFor="let msj of listaMensajes">
+                <div>
+                    <div class="text-left" *ngIf="msj.usuario == authService.user.email"><span class="badge bg-primary text-dark">{{msj.usuario}}</span></div>
+                    <div class="text-left" *ngIf="msj.usuario == authService.user.email"><span>{{msj.mensaje}}</span></div>
+                </div>
+                <div>
+                    <div class="text-right" *ngIf="!(msj.usuario == authService.user.email)"><span class="badge bg-secondary text-dark">{{msj.usuario}}</span></div>
+                    <div class="text-right" *ngIf="!(msj.usuario == authService.user.email)"><span>{{msj.mensaje}}</span></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="input-group input-group-sm">
+                    <input type="text" [(ngModel)]="nuevoMensaje.mensaje" class="form-control" placeholder="Your message..." autofocus />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary" (click)="EnviarMensaje()"><i class="fa fa-paper-plane-o fa-fw"></i><span class="d-none d-sm-inline"> Enviar</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-form-subir-archivos></app-form-subir-archivos>

@@ -9,16 +9,18 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
-  token:string | undefined;
+  user:Usuario;
   constructor(public _authService: AuthService) { 
+    this.user = this._authService.user;;
   }
 
   ngOnInit(): void {
   }
   
   logOut(){
-    this.token = undefined;
-    Usuario.clearToken();
-    this._authService.setUserAuthenticated();
+    //this.token = undefined;
+    //Usuario.clearToken();
+    //this._authService.setUserAuthenticated();
+    this._authService.logout();
   }
 }

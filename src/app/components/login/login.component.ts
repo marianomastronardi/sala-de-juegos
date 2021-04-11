@@ -4,6 +4,7 @@ import { Usuario } from 'src/app/models/usuario';
 import { AuthService } from 'src/app/services/auth.service';
 import firebase from "firebase/app";
 import "firebase/auth";
+import { unescapeIdentifier } from '@angular/compiler';
 
 @Component({
   selector: 'app-login',
@@ -13,8 +14,7 @@ import "firebase/auth";
 export class LoginComponent implements OnInit {
 
   usuario: Usuario = new Usuario();
-  isValidUser: boolean = true;
-  isValidPassword: boolean = true;
+  signInError: string = '';
   credential: any = {};
 
   constructor(private _authService: AuthService,
@@ -23,31 +23,53 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  signIn() {
-    this.isValidUser = true;
-    this.isValidPassword = true;
-
-    this._authService.getAll()
-      .get()
-      .subscribe((querySnapshot) => {
-        querySnapshot.forEach((user: any) => {
-          if (user) {
-            if (this.usuario.email == user.data().email) {
-              if (this.usuario.password == user.data().password) {
-                Usuario.setToken('Authorized');
-                this._authService.setUserAuthenticated();
-                this.route.navigate(['home'])
-              } else {
-                this.isValidPassword = false;
-              }
-            };
-          } else {
-            this.isValidUser = false;
-          }
-        });
-        if (querySnapshot.docs.length > 0 && this.isValidPassword && this.isValidUser) this.isValidUser = false
+  signIn(email: string, password: string) {
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        console.log(userCredential.user)
+        // Signed in
+        var user = userCredential.user;
+        //var token = user?.refreshToken == undefined ? '' : user.refreshToken;
+        //Usuario.setToken(token);
+        //this._authService.setUserAuthenticated(); 
+        this._authService.setAuthenticatedUser(user?.uid, user?.email, user?.refreshToken);
+        if (user?.uid != undefined) this._authService.user.uid = user.uid;
+        if (user?.email != undefined) this._authService.user.email = user.email;
+        this.route.navigate(['home'])
+        // ...
       })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        this.signInError = errorMessage;
+      });
   }
+
+  /*   signIn() {
+      this.isValidUser = true;
+      this.isValidPassword = true;
+  
+      this._authService.getAll()
+        .get()
+        .subscribe((querySnapshot) => {
+          querySnapshot.forEach((user: any) => {
+            if (user) {
+              if (this.usuario.email == user.data().email) {
+                if (this.usuario.password == user.data().password) {
+                  Usuario.setToken('Authorized');
+                  this._authService.setUserAuthenticated();
+                  this.route.navigate(['home'])
+                } else {
+                  this.isValidPassword = false;
+                }
+              };
+            } else {
+              this.isValidUser = false;
+            }
+          });
+          if (querySnapshot.docs.length > 0 && this.isValidPassword && this.isValidUser) this.isValidUser = false
+        })
+    } */
 
   signInByGithub() {
     this.githubSignInPopup(this.githubProvider());
@@ -82,17 +104,17 @@ export class LoginComponent implements OnInit {
       .auth()
       .signInWithPopup(provider)
       .then((result) => {
-        console.log(result)
         /** @type {firebase.auth.OAuthCredential} */
-        var credential:any = result.credential;
+        var credential: any = result.credential;
         // This gives you a GitHub Access Token. You can use it to access the GitHub API.
-        var token:string = credential.accessToken;
+        //var token:string = credential.accessToken;
 
         // The signed-in user info.
         var user = result.user;
         // ...
-        Usuario.setToken(token);
-        this._authService.setUserAuthenticated();
+        this._authService.setAuthenticatedUser(user?.uid, user?.email, credential.accessToken);
+        if (user?.uid != undefined) this._authService.user.uid = user.uid;
+        if (user?.email != undefined) this._authService.user.email = user.email;
         this.route.navigate(['home'])
       }).catch((error) => {
         // Handle Errors here.

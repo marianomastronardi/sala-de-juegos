@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Usuario } from 'src/app/models/usuario';
 import { AuthService } from 'src/app/services/auth.service';
+import firebase from "firebase/app";
+import "firebase/auth";
 
 @Component({
   selector: 'app-registro',
@@ -11,14 +13,33 @@ import { AuthService } from 'src/app/services/auth.service';
 export class RegistroComponent implements OnInit {
 
   usuario:Usuario = new Usuario();
-  alreadyExistsUser:boolean = false;
+  signUpError:string = '';
   constructor(private _authService: AuthService,
               private route: Router) { }
 
   ngOnInit(): void {
   }
 
-  signUp(){
+  signUp(email:string, password:string){
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // Signed in
+      var user = userCredential.user;
+      //var token = user?.refreshToken == undefined ? '' : user.refreshToken;
+      //Usuario.setToken(token);
+      //this._authService.setUserAuthenticated();
+      this._authService.setAuthenticatedUser(user?.uid, user?.email, user?.refreshToken)
+      this.route.navigate(['home'])
+      // ...
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      this.signUpError = errorMessage;
+      // ..
+    });
+  }
+  /* signUp(){
     this.alreadyExistsUser = false;
 
     this._authService.getAll()
@@ -39,5 +60,5 @@ export class RegistroComponent implements OnInit {
         this.route.navigate(['home'])
       }
   })
-  }
+  } */
 }

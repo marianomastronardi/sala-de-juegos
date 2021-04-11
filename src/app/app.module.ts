@@ -12,6 +12,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule } from '@angular/fire/da
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
 import { RegistroComponent } from './components/registro/registro.component';
+import { JuegosModule } from './components/juegos/juegos.module';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { RegistroComponent } from './components/registro/registro.component';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
-    FormsModule
+    FormsModule,
+    JuegosModule
   ],
   providers: [],
   bootstrap: [AppComponent]

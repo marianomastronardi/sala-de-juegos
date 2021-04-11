@@ -1,0 +1,38 @@
+.d-flex {
+    height: 100vh;
+    /* Changed purely for Stack example */
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+    width: 55vh;
+}
+
+.card {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.badge {
+    font-weight: 400;
+}
+
+
+/* NEW */
+
+.card-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.text-left,
+.text-right {
+    margin-top: 0vh;
+    margin-right: 0vh;
+    margin-bottom: 0vh;
+    margin-left: 0vh;
+    padding-top: 0vh;
+    padding-right: 0vh;
+    padding-bottom: 0vh;
+    padding-left: 0vh;
+    width: 50vh;
+}

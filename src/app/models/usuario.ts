@@ -1,10 +1,14 @@
 export class Usuario {
+    uid:string;
     email: string;
     password: string;
+    token?: string;
 
     constructor() {
+        this.uid = '';
         this.email = '';
         this.password = '';
+        this.token = undefined;
     }
 
     public static setToken(token:string):void{
@@ -18,4 +22,5 @@ export class Usuario {
     public static clearToken():void{
         localStorage.clear();
     }
+
 }
