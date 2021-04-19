@@ -26,7 +26,6 @@ export class LoginComponent implements OnInit {
   signIn(email: string, password: string) {
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        console.log(userCredential.user)
         // Signed in
         var user = userCredential.user;
         //var token = user?.refreshToken == undefined ? '' : user.refreshToken;

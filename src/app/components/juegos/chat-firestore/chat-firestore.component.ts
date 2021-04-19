@@ -29,17 +29,18 @@ export class ChatFirestoreComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this._mensajeFirestore.MensajesRef
-      /* .ref
-      .orderBy('fecha', 'desc')
-      .limit(5)
-      .get()
-      .then((querySnapshot) => {
-              querySnapshot.forEach((doc) => {
-                this.listaMensajes.push(doc.data());
-        })
-      }) */
-      .valueChanges()
+    this._mensajeFirestore.getChatByGame(this.juego)
+    .valueChanges()
+    .subscribe((doc: Mensajes[]) => {
+      this.listaMensajes = doc
+      .sort((m1: Mensajes, m2: Mensajes) => {
+        if (m1.fecha > m2.fecha) return 1;
+        if (m1.fecha < m2.fecha) return -1;
+        return 0
+      })
+    });
+    /*this._mensajeFirestore.getAll()
+       .valueChanges()
       .subscribe((doc: Mensajes[]) => {
         this.listaMensajes = doc
                               //.filter((value: Mensajes) => (value.juego == this.juego)) 
@@ -50,7 +51,11 @@ export class ChatFirestoreComponent implements OnInit {
                               })
                               .slice(doc.length - 5, doc.length)
       });
-      this.listaMensajes = this.listaMensajes.filter((value: Mensajes) => (value.juego == this.juego)); 
+      this.listaMensajes = this.listaMensajes.filter((value: Mensajes) => (value.juego == this.juego)); */ 
+  }
+
+  onKey(event: any) { // without type info
+    if(event.key == 'Enter') this.EnviarMensaje();
   }
 
   EnviarMensaje() {

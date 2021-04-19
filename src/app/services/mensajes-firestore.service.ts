@@ -30,4 +30,10 @@ export class MensajesFirestoreService {
   delete(id: string): Promise<void> {
     return this.MensajesRef.doc(id).delete();
   }
+
+  getChatByGame(juego:string): AngularFirestoreCollection<Mensajes> {
+    //where('juego','==', juego).
+    return  this.db.collection(this.dbPath, ref => ref.orderBy('fecha','desc').limit(5));
+  }
+  //this.MensajesRef = db.collection(this.dbPath, ref => ref.where('juego','==', juego)..orderBy('created'));
 }

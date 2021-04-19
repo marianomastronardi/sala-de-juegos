@@ -2,8 +2,10 @@ export class Jugador {
     email: string;
     salaActual: string;
     estadoJugada: boolean;
-    opcion:string;
-    puntosSesion:number;
+    opcion: string;
+    puntosSesion: number;
+    x: boolean;
+    o: boolean;
 
     constructor() {
         this.email = '';
@@ -11,5 +13,7 @@ export class Jugador {
         this.estadoJugada = false;
         this.opcion = '';
         this.puntosSesion = 0;
+        this.x = false;
+        this.o = false;
     }
 }

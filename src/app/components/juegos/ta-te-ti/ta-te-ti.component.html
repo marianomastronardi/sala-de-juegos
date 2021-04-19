@@ -1,44 +1,47 @@
 <div class="container mt-5">
     <a class="btn btn-outline-success mt-2 mb-5" [routerLink]="'/home'">Ir a Home</a><br>
-    <div *ngIf="!jugador.eligio">
+    <div *ngIf="!sala.chosen">
         <p>Elija con que jugar</p><button class="btn btn-outline-primary" (click)="elegirOpcion('x')">X</button><button class="btn btn-outline-primary" (click)="elegirOpcion('o')">O</button>
     </div>
-    <table class="table table-bordered border-dark w-auto" *ngIf="jugador.eligio">
+    <table class="table table-bordered border-dark w-auto" *ngIf="sala.chosen">
         <tbody>
             <tr>
-                <td><img *ngIf="tabla.a1 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.a1 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('a1')" *ngIf="!tabla.a1">Pulsar</button>
+                <td><img *ngIf="sala.tabla.a1.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.a1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a1')" *ngIf="!sala.tabla.a1.x && !sala.tabla.a1.o">Pulsar</button>
                 </td>
-                <td><img *ngIf="tabla.a2 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.a2 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('a2')" *ngIf="!tabla.a2">Pulsar</button>
+                <td><img *ngIf="sala.tabla.a2.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.a2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a2')" *ngIf="!sala.tabla.a2.x && !sala.tabla.a2.o">Pulsar</button>
                 </td>
-                <td><img *ngIf="tabla.a3 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.a3 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('a3')" *ngIf="!tabla.a3">Pulsar</button>
-                </td>
-            </tr>
-            <tr>
-                <td><img *ngIf="tabla.b1 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.b1 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('b1')" *ngIf="!tabla.b1">Pulsar</button>
-                </td>
-                <td><img *ngIf="tabla.b2 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.b2 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('b2')" *ngIf="!tabla.b2">Pulsar</button>
-                </td>
-                <td><img *ngIf="tabla.b3 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.b3 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('b3')" *ngIf="!tabla.b3">Pulsar</button>
+                <td><img *ngIf="sala.tabla.a3.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.a3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a3')" *ngIf="!sala.tabla.a3.x && !sala.tabla.a3.o">Pulsar</button>
                 </td>
             </tr>
             <tr>
-                <td><img *ngIf="tabla.c1 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.c1 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('c1')" *ngIf="!tabla.c1">Pulsar</button>
+                <td><img *ngIf="sala.tabla.b1.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.b1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b1')" *ngIf="!sala.tabla.b1.x && !sala.tabla.b1.o">Pulsar</button>
                 </td>
-                <td><img *ngIf="tabla.c2 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.c2 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('c2')" *ngIf="!tabla.c2">Pulsar</button>
+                <td><img *ngIf="sala.tabla.b2.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.b2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b2')" *ngIf="!sala.tabla.b2.x && !sala.tabla.b2.o">Pulsar</button>
                 </td>
-                <td><img *ngIf="tabla.c3 && jugador.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="tabla.c3 && jugador.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" (click)="pulsar('c3')" *ngIf="!tabla.c3">Pulsar</button>
+                <td><img *ngIf="sala.tabla.b3.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.b3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b3')" *ngIf="!sala.tabla.b3.x && !sala.tabla.b3.o">Pulsar</button>
+                </td>
+            </tr>
+            <tr>
+                <td><img *ngIf="sala.tabla.c1.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.c1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c1')" *ngIf="!sala.tabla.c1.x && !sala.tabla.c1.o">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tabla.c2.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.c2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c2')" *ngIf="!sala.tabla.c2.x && !sala.tabla.c2.o">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tabla.c3.x" src="../../../../assets/X.jpg" alt="">
+                    <img *ngIf="sala.tabla.c3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c3')" *ngIf="!sala.tabla.c3.x && !sala.tabla.c3.o">Pulsar</button>
                 </td>
             </tr>
         </tbody>
     </table>
+    <div class="alert alert-primary" *ngIf="resultado.length > 0" role="alert">
+        {{ resultado }}
+    </div>
 </div>
-<app-chat-firestore juego='TaTeTi'></app-chat-firestore>
+<app-chat-firestore [juego]="juego"></app-chat-firestore>

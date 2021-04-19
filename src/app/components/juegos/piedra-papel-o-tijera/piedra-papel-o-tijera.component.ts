@@ -4,6 +4,10 @@ import { AuthService } from 'src/app/services/auth.service';
 import { SalaService } from "../../../services/sala.service";
 import { Sala } from '../../../models/sala';
 import { Jugador } from 'src/app/models/jugador';
+import { uid } from 'uid';
+import { map } from "rxjs/operators";
+import { ViewFlags } from '@angular/compiler/src/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-piedra-papel-o-tijera',
@@ -16,126 +20,216 @@ export class PiedraPapelOTijeraComponent implements OnInit {
   sala: Sala;
   listaSalas: Sala[] = [];
   soyJugador1: boolean = false;
+  jugador1!: Jugador;
+  jugador2!: Jugador;
+  listPlayers: Jugador[] = [];
+  juego: string = 'PiedraPapelOTijera';
+  docID: string = '';
+  private searchEventSubscription: Subscription = new Subscription();
 
   constructor(private route: Router,
     private _authService: AuthService,
     private _salaService: SalaService) {
     this.sala = new Sala();
+    this.init();
   }
 
   ngOnInit(): void {
+
+  }
+
+  init() {
     if ((this._authService.user.token == null || this._authService.user.token == '')) {
       this.route.navigate(['signin'])
     } else {
-      this._salaService.SalaRef
-        .valueChanges()
-        .subscribe((doc: Sala[]) => {
-          this.listaSalas = doc.filter((value: Sala) => value.nombreJuego == 'PiedraPapelOTijera' && value.ready == false)
-        })
+      this.searchEventSubscription =
+        this._salaService.getSalaPorJuego(this.juego)
+          .snapshotChanges()
+          .pipe(
+            map(changes =>
+              changes.map((c: any) => {
+                console.log('c', c)
+                this.docID = c.payload.doc.id;
+                return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
+              }
+              )
+            )
+          )
+          .subscribe((doc: any) => {
+            console.log('doc', doc)
+            this.listaSalas = (doc) ? doc : [];
 
-      if (this.listaSalas.length == 0) {
-        this.sala = new Sala();
-        this.sala.nombreJuego = 'PiedraPapelOTijera';
-        this.sala.ready = false;
-        this.sala.jugador1 = new Jugador();
-        this.sala.jugador1.email = this._authService.user.email;
-        this.sala.jugador1.estadoJugada = false;
-        this.sala.jugador1.salaActual = this.sala.id;
-        console.log(this.sala)
-        this._salaService.create(this.sala)
-      } else {
-        var oSala = this.listaSalas.find((value: Sala) => (!(value.jugador1.email == undefined || value.jugador1.email == null)))
-        if (oSala != undefined && oSala != null) {
-          this.sala = oSala;
-          this.sala.ready = true;
-          this.sala.jugador2 = new Jugador();
-          this.sala.jugador2.email = this._authService.user.email;
-          this.sala.jugador2.estadoJugada = false;
-          this.sala.jugador2.salaActual = this.sala.id;
-          console.log(this.sala)
-          this._salaService.update(this.sala.id, this.sala);
-        }
-      }
+            if (this.listaSalas.length == 0) {
+              this.sala = new Sala();
+              this.sala.nombreJuego = this.juego;
+              this.sala.ready = false;
+              this.jugador1 = new Jugador();
+              this.jugador1.email = this._authService.user.email;
+              this.jugador1.estadoJugada = false;
+              this.sala.id = uid();
+              this.jugador1.salaActual = this.sala.id;
+              this.listPlayers.push(this.jugador1);
+              this.sala.jugador1 = JSON.stringify(this.listPlayers[0]);
+              console.log('create', this.sala)
+              this._salaService.create(this.sala);
+              this.searchEventSubscription.unsubscribe()
+              this.getMyRoom()
+            } else {
+
+              var oSala = this.listaSalas.find((value: Sala) => {
+                this.jugador1 = JSON.parse(value.jugador1);
+                return (!(this.jugador1.email == undefined || this.jugador1.email == null))
+              })
+
+              if (oSala != undefined && oSala != null && this._authService.user.email != this.jugador1.email) {
+                this.sala = oSala;
+                this.sala.ready = true;
+                this.jugador2 = new Jugador();
+                this.jugador2.email = this._authService.user.email;
+                this.jugador2.estadoJugada = false;
+                this.jugador2.salaActual = this.sala.id;
+                this.listPlayers.push(this.jugador1);
+                this.listPlayers.push(this.jugador2);
+                this.sala.jugador1 = JSON.stringify(this.jugador1);
+                this.sala.jugador2 = JSON.stringify(this.jugador2);
+                console.log('sala', this.sala);
+                this._salaService.update(this.docID, this.sala);
+                this.setSala(this.sala)
+                this.searchEventSubscription.unsubscribe()
+                this.getMyRoom()
+              }
+            }
+          }
+          )
     }
   }
 
+  getMyRoom() {
+    this.searchEventSubscription =
+      this._salaService.getMiSalaPorJuego(this.juego)
+        .snapshotChanges()
+        .pipe(
+          map(changes =>
+            changes.map((c: any) => {
+              this.docID = c.payload.doc.id;
+              return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
+            }
+            )
+          )
+        )
+        .subscribe((doc: any) => {
+          if (doc[0]) {
+            this.sala.id = doc[0].id;
+            this.sala.nombreJuego = doc[0].nombreJuego;
+            this.sala.ready = doc[0].ready;
+            this.sala.finalizado = doc[0].finalizado;
+            this.sala.jugador1 = doc[0].jugador1;
+            this.sala.jugador2 = doc[0].jugador2;
+            this.jugador1 = new Jugador();
+            this.jugador2 = new Jugador();
+            this.jugador1 = JSON.parse(doc[0].jugador1);
+            this.jugador2 = JSON.parse(doc[0].jugador2);
+          }
+        }
+        )
+  }
+
+  setSala(oSala: Sala) {
+    this.sala = oSala;
+  }
+
   setearJugada(opcion: string) {
-    if (this._authService.user.email == this.sala.jugador1.email) {
+    if (this._authService.user.email == this.jugador1.email) {
       //jugador 1
-      this.sala.jugador1.opcion = opcion;
-      this.sala.jugador1.estadoJugada = true;
+      this.jugador1.opcion = opcion;
+      this.jugador1.estadoJugada = true;
+      this.sala.jugador1 = JSON.stringify(this.jugador1);
       this.soyJugador1 = true;
     } else {
       //jugador 2
-      this.sala.jugador2.opcion = opcion;
-      this.sala.jugador2.estadoJugada = true;
+      this.jugador2.opcion = opcion;
+      this.jugador2.estadoJugada = true;
+      this.sala.jugador2 = JSON.stringify(this.jugador2);
     }
-    this._salaService.update(this.sala.id, this.sala);
 
-    if (this.sala.jugador1.estadoJugada && this.sala.jugador2.estadoJugada) {
+    if (this.jugador1.estadoJugada && this.jugador2.estadoJugada) {
       this.setResultado();
-      this.sala.jugador1.estadoJugada = false;
-      this.sala.jugador2.estadoJugada = false;
-      this.sala.jugador1.opcion = '';
-      this.sala.jugador2.opcion = '';
+      this.sala.resultado = this.resultado;
+      this.jugador1.estadoJugada = false;
+      this.jugador2.estadoJugada = false;
+      this.jugador1.opcion = '';
+      this.jugador2.opcion = '';
+      this.sala.jugador1 = JSON.stringify(this.jugador1);
+      this.sala.jugador2 = JSON.stringify(this.jugador2);
+    }
 
-      if (this.sala.jugador1.puntosSesion == 3 || this.sala.jugador2.puntosSesion == 3) {
-        setTimeout(() => {
-          this.resultado = this.sala.jugador1.puntosSesion == 3 ? this.sala.jugador1.email : this.sala.jugador2.email + ' ganó el juego!!';
-          this.sala.finalizado = true;
-        }, 2000);
+    this._salaService.update(this.docID, Object.assign({}, this.sala));
 
-      this.resultado = '';
-      }
+    setTimeout(() => {
+      this.sala.resultado = '';
+    }, 2000);
+
+    if (this.jugador1.puntosSesion == 3 || this.jugador2.puntosSesion == 3) {
+      this.resultado = (this.jugador1.puntosSesion == 3 ? this.jugador1.email : this.jugador2.email) + ' ganó el juego!!';
+      this.sala.resultado = this.resultado;
+      this.sala.finalizado = true;
+      this._salaService.update(this.docID, Object.assign({}, this.sala));
+      this.searchEventSubscription.unsubscribe();
+      
+      setTimeout(() => {
+        this.resultado = '';
+        this.sala.resultado = this.resultado;
+        this.route.navigate(['home'])
+      }, 2000);
     }
   }
 
   setResultado() {
 
-    switch (this.sala.jugador1.opcion) {
+    switch (this.jugador1.opcion) {
       case 'piedra':
-        switch (this.sala.jugador2.opcion) {
+        switch (this.jugador2.opcion) {
           case 'piedra':
             this.resultado = 'Empate!!'
             break;
           case 'papel':
-            this.resultado = 'Jugador 2 gana!!'
-            this.sala.jugador2.puntosSesion += 1;
+            this.resultado = this.jugador2.email + ' gana!!'
+            this.jugador2.puntosSesion += 1;
             break;
           case 'tijera':
-            this.resultado = 'Jugador 1 gana!!'
-            this.sala.jugador1.puntosSesion += 1;
+            this.resultado = this.jugador1.email + ' gana!!'
+            this.jugador1.puntosSesion += 1;
             break;
           default:
             break;
         }
         break;
       case 'papel':
-        switch (this.sala.jugador2.opcion) {
+        switch (this.jugador2.opcion) {
           case 'piedra':
-            this.resultado = 'Jugador 1 gana!!'
-            this.sala.jugador1.puntosSesion += 1;
+            this.resultado = this.jugador1.email + ' gana!!'
+            this.jugador1.puntosSesion += 1;
             break;
           case 'papel':
             this.resultado = 'Empate!!'
             break;
           case 'tijera':
-            this.resultado = 'Jugador 2 gana!!'
-            this.sala.jugador2.puntosSesion += 1;
+            this.resultado = this.jugador2.email + ' gana!!'
+            this.jugador2.puntosSesion += 1;
             break;
           default:
             break;
         }
         break;
       case 'tijera':
-        switch (this.sala.jugador2.opcion) {
+        switch (this.jugador2.opcion) {
           case 'piedra':
-            this.resultado = 'Jugador 2 gana!!'
-            this.sala.jugador2.puntosSesion += 1;
+            this.resultado = this.jugador2.email + ' gana!!'
+            this.jugador2.puntosSesion += 1;
             break;
           case 'papel':
-            this.resultado = 'Jugador 1 gana!!'
-            this.sala.jugador1.puntosSesion += 1;
+            this.resultado = this.jugador1.email + ' gana!!'
+            this.jugador1.puntosSesion += 1;
             break;
           case 'tijera':
             this.resultado = 'Empate!!'
