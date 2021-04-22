@@ -8,7 +8,9 @@ import { FormSubirArchivosComponent } from './form-subir-archivos/form-subir-arc
 import { ChatFirestoreComponent } from './chat-firestore/chat-firestore.component';
 import { ListadoRealtimeComponent } from './listado-realtime/listado-realtime.component';
 import { FormsModule } from '@angular/forms';
-
+import { MemotestComponent } from './memotest/memotest.component';
+import { HttpClientModule } from '@angular/common/http';
+import { QuizzComponent } from './quizz/quizz.component';
 
 @NgModule({
   declarations: [
@@ -16,10 +18,13 @@ import { FormsModule } from '@angular/forms';
       TaTeTiComponent, 
       FormSubirArchivosComponent, 
       ChatFirestoreComponent, 
-      ListadoRealtimeComponent
+      ListadoRealtimeComponent, 
+      MemotestComponent, QuizzComponent
     ],
   imports: [
     CommonModule,
+    HttpClientModule,
+
     JuegosRoutingModule,
     FormsModule
   ]

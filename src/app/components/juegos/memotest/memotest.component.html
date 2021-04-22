@@ -1,0 +1,44 @@
+<div class="container mt-5">
+    <a class="btn btn-outline-success mt-2 mb-5" [routerLink]="'/home'">Ir a Home</a><br>
+    <!--    <div *ngIf="!sala.chosen">
+        <p>Elija con que jugar</p><button class="btn btn-outline-primary" (click)="elegirOpcion('x')">X</button><button class="btn btn-outline-primary" (click)="elegirOpcion('o')">O</button>
+    </div> -->
+    <table class="table table-bordered border-dark w-auto">
+        <tbody>
+            <tr>
+                <td><img *ngIf="sala.tablaMemo.a1" [src]="tablaMemo.fichas.a1" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a1$'+sala.tablaMemo.fichas.a1)" *ngIf="!sala.tablaMemo.a1">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.a2" [src]="tablaMemo.fichas.a2" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a2$'+sala.tablaMemo.fichas.a2)" *ngIf="!sala.tablaMemo.a2">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.a3" [src]="tablaMemo.fichas.a3" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a3$'+sala.tablaMemo.fichas.a3)" *ngIf="!sala.tablaMemo.a3">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.a4" [src]="tablaMemo.fichas.a4" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a4$'+sala.tablaMemo.fichas.a4)" *ngIf="!sala.tablaMemo.a4">Pulsar</button>
+                </td>
+            </tr>
+            <tr>
+                <td><img *ngIf="sala.tablaMemo.b1" [src]="tablaMemo.fichas.b1" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b1$'+sala.tablaMemo.fichas.b1)" *ngIf="!sala.tablaMemo.b1">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.b2" [src]="tablaMemo.fichas.b2" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b2$'+sala.tablaMemo.fichas.b2)" *ngIf="!sala.tablaMemo.b2">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.b3" [src]="tablaMemo.fichas.b3" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b3$'+sala.tablaMemo.fichas.b3)" *ngIf="!sala.tablaMemo.b3">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.b4" [src]="tablaMemo.fichas.b4" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b4$'+sala.tablaMemo.fichas.b4)" *ngIf="!sala.tablaMemo.b4">Pulsar</button>
+                </td>
+            </tr>
+            <tr>
+                <td><img *ngIf="sala.tablaMemo.c1" [src]="tablaMemo.fichas.c1" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c1$'+sala.tablaMemo.fichas.c1)" *ngIf="!sala.tablaMemo.c1">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.c2" [src]="tablaMemo.fichas.c2" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c2$'+sala.tablaMemo.fichas.c2)" *ngIf="!sala.tablaMemo.c2">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.c3" [src]="tablaMemo.fichas.c3" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c3$'+sala.tablaMemo.fichas.c3)" *ngIf="!sala.tablaMemo.c3">Pulsar</button>
+                </td>
+                <td><img *ngIf="sala.tablaMemo.c4" [src]="tablaMemo.fichas.c4" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c4$'+sala.tablaMemo.fichas.c4)" *ngIf="!sala.tablaMemo.c4">Pulsar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="alert alert-primary" *ngIf="resultado.length > 0" role="alert">
+        {{ resultado }}
+    </div>
+</div>
+<app-chat-firestore [juego]="juego"></app-chat-firestore>

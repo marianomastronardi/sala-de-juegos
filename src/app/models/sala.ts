@@ -10,6 +10,7 @@ export class Sala extends Jugador {
     resultado: string;
     chosen: boolean;
     tabla: any;
+    tablaMemo: any;
 
     constructor() {
         super();
@@ -22,6 +23,7 @@ export class Sala extends Jugador {
         this.resultado = '';
         this.chosen = false;
         this.tabla = {};
+        this.tablaMemo = {};
     }
 }
 
