@@ -1,2 +1,39 @@
-<br><br><br><br>
-<p>quizz works!</p>
+<div class="container mt-5">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/home'">Ir a Home</a>
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/survey'">Ir a Encuesta</a><br>
+    </div>
+    <div *ngFor="let elem of questions">
+        <!-- Preguntas -->
+        <label for="">{{ elem.q }}</label>
+        <div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" [(ngModel)]="answers[elem.model]" [name]="elem.o1.id" [id]="elem.o1.id" [value]="elem.o1.value">
+                <label class="form-check-label" [for]="elem.o1.id">{{ elem.o1.value }}</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" [(ngModel)]="answers[elem.model]" [name]="elem.o2.id" [id]="elem.o2.id" [value]="elem.o2.value">
+                <label class="form-check-label" [for]="elem.o2.id">{{ elem.o2.value }}</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" [(ngModel)]="answers[elem.model]" [name]="elem.o3.id" [id]="elem.o3.id" [value]="elem.o3.value">
+                <label class="form-check-label" [for]="elem.o3.id">{{ elem.o3.value }}</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" [(ngModel)]="answers[elem.model]" [name]="elem.o4.id" [id]="elem.o4.id" [value]="elem.o4.value">
+                <label class="form-check-label" [for]="elem.o4.id">{{ elem.o4.value }}</label>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <div class="alert alert-primary" role="alert" *ngIf="showResult">
+        {{resultado}} respuestas correctas.
+    </div>
+    <div class="alert alert-danger" role="alert" *ngIf="isInvalid">
+        Debe seleccionar al menos una respuesta en todas las preguntas
+    </div>
+    <div class="mt-5 mb-5">
+        <button class="btn btn-outline-success" [disabled]="isInvalid" *ngIf="!showResult" (click)="checkAnswers()">Verificar</button>
+        <button class="btn btn-outline-success" *ngIf="showResult" (click)="startAgain()">Jugar de nuevo</button>
+    </div>
+</div>

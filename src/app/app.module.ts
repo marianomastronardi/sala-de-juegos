@@ -10,9 +10,10 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule } from '@angular/fire/database';
 import { environment } from 'src/environments/environment';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegistroComponent } from './components/registro/registro.component';
 import { JuegosModule } from './components/juegos/juegos.module';
+import { SurveyComponent } from './components/survey/survey.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { JuegosModule } from './components/juegos/juegos.module';
     HomeComponent,
     QuienSoyComponent,
     NavbarComponent,
-    RegistroComponent
+    RegistroComponent,
+    SurveyComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +31,8 @@ import { JuegosModule } from './components/juegos/juegos.module';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     FormsModule,
-    JuegosModule
+    ReactiveFormsModule,
+    JuegosModule    
   ],
   providers: [],
   bootstrap: [AppComponent]

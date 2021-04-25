@@ -1,5 +1,9 @@
 <div class="container mt-5">
-    <a class="btn btn-outline-success mt-2 mb-5" [routerLink]="'/home'">Ir a Home</a><br>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/home'">Ir a Home</a>
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/survey'">Ir a Encuesta</a><br>
+    </div>
+
     <div *ngIf="!sala.chosen">
         <p>Elija con que jugar</p><button class="btn btn-outline-primary" (click)="elegirOpcion('x')">X</button><button class="btn btn-outline-primary" (click)="elegirOpcion('o')">O</button>
     </div>

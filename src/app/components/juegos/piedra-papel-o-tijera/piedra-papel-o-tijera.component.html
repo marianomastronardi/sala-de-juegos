@@ -1,5 +1,8 @@
 <div class="container">
-    <a class="btn btn-outline-success mt-2" [routerLink]="'/home'">Ir a Home</a><br>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/home'">Ir a Home</a>
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/survey'">Ir a Encuesta</a><br>
+    </div>
 
     <div *ngIf="sala.ready && !sala.finalizado">
         <p><span class="badge bg-primary mb-2">Elija una opción</span></p>

@@ -1,0 +1,121 @@
+<div class="container" *ngIf="!done">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/home'">Ir a Home</a>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-8 order-md-1">
+            <h4 class="mb-3">Datos Personales</h4>
+            <form [formGroup]="fg" (ngSubmit)="save()">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName">Nombre</label>
+                        <input type="text" class="form-control" id="firstName" formControlName="nombre" placeholder="Ingrese su nombre" value="">
+                        <small class="invalid" *ngIf="fg.get('nombre')?.errors?.required && fg.get('nombre')?.touched">El
+                        nombre es
+                        requerido</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName">Apellido</label>
+                        <input type="text" class="form-control" id="lastName" formControlName="apellido" placeholder="Ingrese su apellido" value="">
+                        <small class="invalid" *ngIf="fg.get('apellido')?.errors?.required && fg.get('apellido')?.touched">El apellido es
+                        requerido</small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="edad" class="form-label">Edad</label>
+                    <input type="number" class="form-control" id="edad" placeholder="Ingrese edad" formControlName="edad">
+                    <small class="invalid" *ngIf="fg.get('edad')?.errors?.required && fg.get('edad')?.touched">La edad
+                    es requerida</small>
+                    <small class="invalid" *ngIf="(fg.get('edad')?.errors?.min || fg.get('edad')?.errors?.max) && fg.get('edad')?.touched">La
+                    edad debe estar entre 18 y 99 años</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="address">Telefono</label>
+                    <input type="text" class="form-control" id="phone" formControlName="telefono" placeholder="1234567890">
+                    <small class="invalid" *ngIf="fg.get('telefono')?.errors?.required && fg.get('telefono')?.touched">El
+                    telefono es requerido</small>
+                    <small class="invalid" *ngIf="fg.get('telefono')?.errors?.contieneCaracteresEspeciales && fg.get('telefono')?.touched">Debe
+                    ingresar solo numeros</small>
+                    <small class="invalid" *ngIf="fg.get('telefono')?.errors?.maxlength">El Telefono tiene un máximo de 10 caracteres</small>
+                </div>
+
+
+                <hr class="mb-4">
+                <h3>Ayudanos a mejorar</h3>
+                <h4>Selecciona las opciones que creas apropiadas</h4>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="improve-ui" formControlName="ch-improve-ui">
+                    <label class="custom-control-label" for="same-address">Mejorar la interfaz</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="perf-issue" formControlName="ch-perf-issue">
+                    <label class="custom-control-label" for="save-info">Tienen serios problemas de performance</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="many-bugs" formControlName="ch-many-bugs">
+                    <label class="custom-control-label" for="save-info">Muchos errores</label>
+                </div>
+                <hr class="mb-4">
+
+                <h4 class="mb-3">Que juego te gustó mas?</h4>
+
+                <div class="d-block my-3">
+                    <div class="custom-control custom-radio">
+                        <input id="ppt" value="ppt" type="radio" class="custom-control-input" formControlName="most-enjoyed" checked="">
+                        <label class="custom-control-label" for="ppt">Piedra, Papel o Tijera</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input id="ttt" value="ttt" type="radio" class="custom-control-input" formControlName="most-enjoyed">
+                        <label class="custom-control-label" for="ttt">Ta-Te-Ti</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input id="memo" value="memo" type="radio" class="custom-control-input" formControlName="most-enjoyed">
+                        <label class="custom-control-label" for="memo">Memotest</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input id="quiz" value="quiz" type="radio" class="custom-control-input" formControlName="most-enjoyed">
+                        <label class="custom-control-label" for="quiz">Quiz</label>
+                    </div>
+                </div>
+
+                <hr class="mb-4">
+
+                <h4 class="mb-3">Que impresión te dejó nuestra Sala de Juegos?</h4>
+                <div class="d-block my-3">
+                    <select class="form-select" aria-label="Default select example" formControlName="level">
+                        <option [selected]="true" value="Buena">Buena</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Mala">Mala</option>
+                      </select>
+                    <small class="invalid" *ngIf="fg.get('level')?.errors?.required">El campo es requerido</small>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="obs">Reseña</label>
+                        <textarea class="form-control" id="obs" rows="3" placeholder="Ingrese un comentario" formControlName="review"></textarea>
+                        <small class="invalid" *ngIf="fg.get('review')?.errors?.required && fg.get('review')?.touched">
+                            La reseña es rquerida
+                        </small>
+                        <small class="invalid" *ngIf="(fg.get('review')?.errors?.minlength || fg.get('review')?.errors?.maxlength)">
+                            La reseña debe tener entre 1 y 500 caracteres.
+                        </small>
+                    </div>
+                </div>
+                <hr class="mb-4">
+                <div class="d-grid gap-2 mb-5">
+                    <button class="btn btn-primary" type="submit">Enviar</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container" *ngIf="done">
+    <div class="alert alert-success mt-5" role="alert">
+        Gracias por tu tiempo
+    </div>
+</div>
