@@ -16,287 +16,210 @@ import { uid } from 'uid';
 export class TaTeTiComponent implements OnInit {
 
   tabla: any = {};
-  juego: string = 'TaTeTi';
   resultado: string = '';
-  sala: Sala;
-  listaSalas: Sala[] = [];
-  soyJugador1: boolean = false;
-  jugador1!: Jugador;
-  jugador2!: Jugador;
-  listPlayers: Jugador[] = [];
+  sala!: Sala;
+  player!: Jugador;
+  bot!: Jugador;
   docID: string = '';
-  habilitado:boolean = false;
-
-  private searchEventSubscription: Subscription = new Subscription();
+  habilitado: boolean = false;
 
   constructor(private _authService: AuthService,
     private _salaService: SalaService,
     private route: Router) {
-    this.sala = new Sala();
-    this.init();
   }
 
   ngOnInit(): void {
+    this.sala = new Sala();
+    this.sala.nombreJuego = 'TaTeTi';
+    this.player = new Jugador();
+    this.bot = new Jugador();
+    this.player.email = this._authService.user.email;
+    this.player.estado = true;
+    this.sala.player = JSON.stringify(this.player);
+    this.sala.bot = JSON.stringify(this.bot);
+
+    this.tabla.a1 = { x: false, o: false };
+    this.tabla.a2 = { x: false, o: false };
+    this.tabla.a3 = { x: false, o: false };
+    this.tabla.b1 = { x: false, o: false };
+    this.tabla.b2 = { x: false, o: false };
+    this.tabla.b3 = { x: false, o: false };
+    this.tabla.c1 = { x: false, o: false };
+    this.tabla.c2 = { x: false, o: false };
+    this.tabla.c3 = { x: false, o: false };
+
+    this.sala.tabla = this.tabla;
+
     if ((this._authService.user.token == null || this._authService.user.token == '')) {
       this.route.navigate(['signin'])
+    } else {
+      this._salaService.create(this.sala).then((docRef) => {
+        this.docID = docRef.id;
+        this._salaService.getSalaById(this.docID)
+          .valueChanges()
+          .subscribe((doc: any) => {
+            this.sala = doc;
+            this.player = JSON.parse(this.sala.player);
+            this.bot = JSON.parse(this.sala.bot);
+            if (this.bot.estado && !this.sala.finalizado) this.setJugadaBot();
+          })
+      })
     }
   }
 
+  setJugadaBot() {
+    let cell = '';
+    let verify = false;
+    do {
+      let option = Math.floor(Math.random() * 9) + 1;
+
+      switch (option) {
+        case 1:
+          verify = this.bot.x ? this.tabla.a1.x : this.tabla.a1.o;
+          cell = 'a1';
+          break;
+        case 2:
+          verify = this.bot.x ? this.tabla.a2.x : this.tabla.a2.o;
+          cell = 'a2';
+          break;
+        case 3:
+          verify = this.bot.x ? this.tabla.a3.x : this.tabla.a3.o;
+          cell = 'a3';
+          break;
+        case 4:
+          verify = this.bot.x ? this.tabla.b1.x : this.tabla.b1.o;
+          cell = 'b1';
+          break;
+        case 5:
+          verify = this.bot.x ? this.tabla.b2.x : this.tabla.b2.o;
+          cell = 'b2';
+          break;
+        case 6:
+          verify = this.bot.x ? this.tabla.b3.x : this.tabla.b3.o;
+          cell = 'b3';
+          break;
+        case 7:
+          verify = this.bot.x ? this.tabla.c1.x : this.tabla.c1.o;
+          cell = 'c1';
+          break;
+        case 8:
+          verify = this.bot.x ? this.tabla.c2.x : this.tabla.c2.o;
+          cell = 'c2';
+          break;
+        case 9:
+          verify = this.bot.x ? this.tabla.c3.x : this.tabla.c3.o;
+          cell = 'c3';
+          break;
+        default:
+          break;
+      }
+    } while (verify);
+
+    this.pulsar(cell);
+  }
+
   elegirOpcion(opcion: string) {
-    this.jugador1 = JSON.parse(this.sala.jugador1);
-    this.jugador2 = JSON.parse(this.sala.jugador2);
-    console.log(this.jugador1)
-    if (this._authService.user.email == this.jugador1.email) {
-      this.jugador1.opcion = opcion
-      if (opcion == 'x') {
-        this.jugador1.x = true;
-        this.jugador2.o = true;
-      } else {
-        this.jugador1.o = true;
-        this.jugador2.x = true;
-      }
+    this.player = JSON.parse(this.sala.player);
+    this.bot = JSON.parse(this.sala.bot);
+
+    if (opcion == 'x') {
+      this.player.x = true;
+      this.bot.o = true;
+      this.player.opcion = opcion;
+      this.bot.opcion = 'o';
     } else {
-      this.jugador2.opcion = opcion
-      if (opcion == 'x') {
-        this.jugador1.o = true;
-        this.jugador2.x = true;
-      } else {
-        this.jugador1.x = true;
-        this.jugador2.o = true;
-      }
+      this.player.o = true;
+      this.bot.x = true;
+      this.player.opcion = opcion;
+      this.bot.opcion = 'x';
     }
-    this.sala.jugador1 = JSON.stringify(this.jugador1);
-    this.sala.jugador2 = JSON.stringify(this.jugador2);
-    this.sala.chosen = true;
+
+    this.player.chosen = true;
+    this.sala.player = JSON.stringify(this.player);
+    this.sala.bot = JSON.stringify(this.bot);
     this._salaService.update(this.docID, Object.assign({}, this.sala));
   }
 
   pulsar(celda: string) {
-    this.jugador1 = JSON.parse(this.sala.jugador1);
-    this.jugador2 = JSON.parse(this.sala.jugador2);
+    this.player = JSON.parse(this.sala.player);
+    this.bot = JSON.parse(this.sala.bot);
     switch (celda) {
       case 'a1':
-        this.tabla.a1.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.a1.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.a1.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.a1.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'a2':
-        this.tabla.a2.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.a2.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.a2.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.a2.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'a3':
-        this.tabla.a3.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.a3.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.a3.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.a3.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'b1':
-        this.tabla.b1.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.b1.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.b1.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.b1.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'b2':
-        this.tabla.b2.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.b2.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.b2.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.b2.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'b3':
-        this.tabla.b3.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.b3.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.b3.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.b3.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'c1':
-        this.tabla.c1.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.c1.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.c1.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.c1.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'c2':
-        this.tabla.c2.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.c2.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.c2.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.c2.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       case 'c3':
-        this.tabla.c3.x = (this._authService.user.email == this.jugador1.email) ? this.jugador1.x : this.jugador2.x;
-        this.tabla.c3.o = (this._authService.user.email == this.jugador1.email) ? this.jugador1.o : this.jugador2.o;
+        this.tabla.c3.x = (this.player.estado) ? this.player.x : this.bot.x;
+        this.tabla.c3.o = (this.player.estado) ? this.player.o : this.bot.o;
         break;
       default:
         break;
     }
     this.sala.tabla = this.tabla;
-    this.jugador1.estadoJugada = (this._authService.user.email == this.jugador1.email)
-    this.jugador2.estadoJugada = (this._authService.user.email == this.jugador2.email)
     this.sala.finalizado = this.checkResultado();
-    this.sala.jugador1 = JSON.stringify(this.jugador1);
-    this.sala.jugador2 = JSON.stringify(this.jugador2);    
+    if (this.sala.finalizado) {
+      if (this.resultado = 'Ganaste') {
+        this.player.score = Math.round(Math.abs((new Date().getTime() - new Date(this.sala.startDate).getTime()) / 1000));
+      }
+    }
+    this.player.estado = !this.player.estado;
+    this.bot.estado = !this.bot.estado;
+    this.sala.player = JSON.stringify(this.player);
+    this.sala.bot = JSON.stringify(this.bot);
     this._salaService.update(this.docID, Object.assign({}, this.sala));
-    
-  }
 
-  init() {
-    if ((this._authService.user.token == null || this._authService.user.token == '')) {
-      this.route.navigate(['signin'])
-    } else {
-      this.searchEventSubscription =
-        this._salaService.getSalaPorJuego(this.juego)
-          .snapshotChanges()
-          .pipe(
-            map(changes =>
-              changes.map((c: any) => {
-                console.log('c', c)
-                this.docID = c.payload.doc.id;
-                return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-              }
-              )
-            )
-          )
-          .subscribe((doc: any) => {
-            console.log('doc', doc)
-            this.listaSalas = (doc) ? doc : [];
-
-            if (this.listaSalas.length == 0) {
-              this.sala = new Sala();
-              this.sala.nombreJuego = this.juego;
-              this.sala.ready = false;
-              this.jugador1 = new Jugador();
-              this.jugador1.email = this._authService.user.email;
-              this.jugador1.estadoJugada = false;
-              this.sala.id = uid();
-              this.jugador1.salaActual = this.sala.id;
-              this.listPlayers.push(this.jugador1);
-              this.sala.jugador1 = JSON.stringify(this.listPlayers[0]);
-              console.log('create', this.sala)
-              this._salaService.create(this.sala);
-              this.searchEventSubscription.unsubscribe()
-              this.getMyRoom()
-            } else {
-
-              var oSala = this.listaSalas.find((value: Sala) => {
-                this.jugador1 = JSON.parse(value.jugador1);
-                return (!(this.jugador1.email == undefined || this.jugador1.email == null))
-              })
-
-              if (oSala != undefined && oSala != null && this._authService.user.email != this.jugador1.email) {
-                this.sala = oSala;
-                this.sala.ready = true;
-                this.jugador2 = new Jugador();
-                this.jugador2.email = this._authService.user.email;
-                this.jugador2.estadoJugada = false;
-                this.jugador2.salaActual = this.sala.id;
-                this.listPlayers.push(this.jugador1);
-                this.listPlayers.push(this.jugador2);
-                this.sala.jugador1 = JSON.stringify(this.jugador1);
-                this.sala.jugador2 = JSON.stringify(this.jugador2);
-                console.log('sala', this.sala);
-
-                this.tabla.a1 = {};
-                this.tabla.a2 = {};
-                this.tabla.a3 = {};
-                this.tabla.b1 = {};
-                this.tabla.b2 = {};
-                this.tabla.b3 = {};
-                this.tabla.c1 = {};
-                this.tabla.c2 = {};
-                this.tabla.c3 = {};
-
-                this.tabla.a1 = {};
-                this.tabla.a2 = {};
-                this.tabla.a3 = {};
-                this.tabla.b1 = {};
-                this.tabla.b2 = {};
-                this.tabla.b3 = {};
-                this.tabla.c1 = {};
-                this.tabla.c2 = {};
-                this.tabla.c3 = {};
-
-                this.tabla.a1.x = false;
-                this.tabla.a2.x = false;
-                this.tabla.a3.x = false;
-                this.tabla.b1.x = false;
-                this.tabla.b2.x = false;
-                this.tabla.b3.x = false;
-                this.tabla.c1.x = false;
-                this.tabla.c2.x = false;
-                this.tabla.c3.x = false;
-
-                this.tabla.a1.o = false;
-                this.tabla.a2.o = false;
-                this.tabla.a3.o = false;
-                this.tabla.b1.o = false;
-                this.tabla.b2.o = false;
-                this.tabla.b3.o = false;
-                this.tabla.c1.o = false;
-                this.tabla.c2.o = false;
-                this.tabla.c3.o = false;
-
-                this.sala.tabla = this.tabla;
-
-                this._salaService.update(this.docID, this.sala);
-                this.setSala(this.sala)
-                this.searchEventSubscription.unsubscribe()
-                this.getMyRoom()
-              }
-            }
-          }
-          )
+    if (this.sala.finalizado) {
+      setTimeout(() => {
+        this.route.navigate(['/home']);
+      }, 2000);
     }
   }
 
-  getMyRoom() {
-    this.searchEventSubscription =
-      this._salaService.getMiSalaPorJuego(this.juego)
-        .snapshotChanges()
-        .pipe(
-          map(changes =>
-            changes.map((c: any) => {
-              this.docID = c.payload.doc.id;
-              return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-            }
-            )
-          )
-        )
-        .subscribe((doc: any) => {
-          if (doc[0]) {
-            this.sala.id = doc[0].id;
-            this.sala.nombreJuego = doc[0].nombreJuego;
-            this.sala.ready = doc[0].ready;
-            this.sala.finalizado = doc[0].finalizado;
-            this.sala.jugador1 = doc[0].jugador1;
-            this.sala.jugador2 = doc[0].jugador2;
-            this.sala.chosen = doc[0].chosen;
-            this.sala.tabla = doc[0].tabla;
-            this.tabla = this.sala.tabla;
-            this.jugador1 = new Jugador();
-            this.jugador2 = new Jugador();
-            this.jugador1 = JSON.parse(doc[0].jugador1);
-            this.jugador2 = JSON.parse(doc[0].jugador2);
-            this.habilitado = (this._authService.user.email == this.jugador1.email) ? this.jugador1.estadoJugada : this.jugador2.estadoJugada;
-            
-          }
-        }
-        )
-  }
-
-  setSala(oSala: Sala) {
-    this.sala = oSala;
-  }
-
-  setearJugada(e: any) {
-    if (this._authService.user.email == this.jugador1.email) {
-
-    } else {
-
-    }
-  }
-
-  checkResultado():boolean{
-    if(this.sala.tabla.a1.x && this.sala.tabla.a2.x && this.sala.tabla.a3.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.b1.x && this.sala.tabla.b2.x && this.sala.tabla.b3.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.c1.x && this.sala.tabla.c2.x && this.sala.tabla.c3.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a1.x && this.sala.tabla.b1.x && this.sala.tabla.c1.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a2.x && this.sala.tabla.b2.x && this.sala.tabla.c2.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a3.x && this.sala.tabla.b3.x && this.sala.tabla.c3.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a1.x && this.sala.tabla.b2.x && this.sala.tabla.c3.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a3.x && this.sala.tabla.b2.x && this.sala.tabla.c1.x) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.x) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a1.o && this.sala.tabla.a2.o && this.sala.tabla.a3.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.b1.o && this.sala.tabla.b2.o && this.sala.tabla.b3.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.c1.o && this.sala.tabla.c2.o && this.sala.tabla.c3.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a1.o && this.sala.tabla.b1.o && this.sala.tabla.c1.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a2.o && this.sala.tabla.b2.o && this.sala.tabla.c2.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a3.o && this.sala.tabla.b3.o && this.sala.tabla.c3.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a1.o && this.sala.tabla.b2.o && this.sala.tabla.c3.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
-    if(this.sala.tabla.a3.o && this.sala.tabla.b2.o && this.sala.tabla.c1.o) {this.resultado = (this._authService.user.email == this.jugador1.email && this.jugador1.o) ? 'Ganaste!!' : 'Perdiste'; this.habilitado = false; this.jugador1.estadoJugada = false; this.jugador2.estadoJugada = false; return true}
+  checkResultado(): boolean {
+    if (this.sala.tabla.a1.x && this.sala.tabla.a2.x && this.sala.tabla.a3.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.b1.x && this.sala.tabla.b2.x && this.sala.tabla.b3.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.c1.x && this.sala.tabla.c2.x && this.sala.tabla.c3.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a1.x && this.sala.tabla.b1.x && this.sala.tabla.c1.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a2.x && this.sala.tabla.b2.x && this.sala.tabla.c2.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a3.x && this.sala.tabla.b3.x && this.sala.tabla.c3.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a1.x && this.sala.tabla.b2.x && this.sala.tabla.c3.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a3.x && this.sala.tabla.b2.x && this.sala.tabla.c1.x) { this.resultado = (this.player.estado && this.player.x) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a1.o && this.sala.tabla.a2.o && this.sala.tabla.a3.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.b1.o && this.sala.tabla.b2.o && this.sala.tabla.b3.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.c1.o && this.sala.tabla.c2.o && this.sala.tabla.c3.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a1.o && this.sala.tabla.b1.o && this.sala.tabla.c1.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a2.o && this.sala.tabla.b2.o && this.sala.tabla.c2.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a3.o && this.sala.tabla.b3.o && this.sala.tabla.c3.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a1.o && this.sala.tabla.b2.o && this.sala.tabla.c3.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
+    if (this.sala.tabla.a3.o && this.sala.tabla.b2.o && this.sala.tabla.c1.o) { this.resultado = (this.player.estado && this.player.o) ? 'Ganaste' : 'Perdiste'; this.habilitado = false; this.player.estado = false; this.bot.estado = false; return true }
 
     return false;
   }

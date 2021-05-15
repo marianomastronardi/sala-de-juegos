@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { MemotestComponent } from './memotest/memotest.component';
 import { HttpClientModule } from '@angular/common/http';
 import { QuizzComponent } from './quizz/quizz.component';
+import { ResultadosComponent } from './resultados/resultados.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { QuizzComponent } from './quizz/quizz.component';
       FormSubirArchivosComponent, 
       ChatFirestoreComponent, 
       ListadoRealtimeComponent, 
-      MemotestComponent, QuizzComponent
+      MemotestComponent, QuizzComponent, ResultadosComponent
     ],
   imports: [
     CommonModule,

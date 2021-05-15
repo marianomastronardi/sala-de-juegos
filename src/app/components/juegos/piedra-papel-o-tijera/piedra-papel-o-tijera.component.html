@@ -4,31 +4,19 @@
         <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/survey'">Ir a Encuesta</a><br>
     </div>
 
-    <div *ngIf="sala.ready && !sala.finalizado">
+    <div *ngIf="!sala.finalizado">
         <p><span class="badge bg-primary mb-2">Elija una opción</span></p>
-        <button class="btn btn-outline-primary m-1" [disabled]="sala.resultado.length > 0"><img src="../../../../assets/piedra.jpg" alt="" (click)="setearJugada('piedra')"></button>
-        <button class="btn btn-outline-primary m-1" [disabled]="sala.resultado.length > 0"><img src="../../../../assets/papel.jpg" alt="" (click)="setearJugada('papel')"></button>
-        <button class="btn btn-outline-primary m-1" [disabled]="sala.resultado.length > 0"><img src="../../../../assets/tijera.jpg" alt="" (click)="setearJugada('tijera')"></button>
+        <button class="btn btn-outline-primary m-1" [disabled]="!player.estado || this.sala.resultado.length > 0"><img src="../../../../assets/piedra.jpg" alt="" (click)="setearJugada('piedra')"></button>
+        <button class="btn btn-outline-primary m-1" [disabled]="!player.estado || this.sala.resultado.length > 0"><img src="../../../../assets/papel.jpg" alt="" (click)="setearJugada('papel')"></button>
+        <button class="btn btn-outline-primary m-1" [disabled]="!player.estado || this.sala.resultado.length > 0"><img src="../../../../assets/tijera.jpg" alt="" (click)="setearJugada('tijera')"></button>
     </div>
 
-    <div *ngIf="!sala.ready" class="mt-1">
-        <div class="alert alert-primary" role="alert">
-            Esperando rival...
-        </div>
-    </div>
-
-
-    <div class="spinner-border" *ngIf="sala.ready && !sala.finalizado && ((jugador1.estadoJugada && !jugador2.estadoJugada && (soyJugador1 !== jugador2.estadoJugada)) || (!jugador1.estadoJugada && jugador2.estadoJugada && (soyJugador1 !== jugador2.estadoJugada)))"
-        role="status">
+    <div class="spinner-border" *ngIf="!sala.finalizado && (!player.estado && bot.estado)" role="status">
         <!-- <span>Esperado la opción del jugador rival...</span> -->
     </div>
 
     <div class="alert alert-primary" *ngIf="sala.resultado.length > 0" role="alert">
         {{ sala.resultado }}
     </div>
-
-    <div *ngIf="sala.finalizado">
-        <button (click)="init()" class="btn btn-outline-success">Volver a Jugar</button>
-    </div>
 </div>
-<app-chat-firestore [juego]="juego"></app-chat-firestore>
+<app-chat-firestore [juego]="sala.nombreJuego"></app-chat-firestore>

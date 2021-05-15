@@ -5,3 +5,7 @@
 .piedra {
     height: 100%;
 }
+
+.btn-outline-primary {
+    border-radius: 50%;
+}

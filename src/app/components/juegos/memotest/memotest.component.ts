@@ -18,21 +18,17 @@ import { stringify } from '@angular/compiler/src/util';
 })
 export class MemotestComponent implements OnInit {
 
-  juego: string = 'Memotest';
   tablaMemo: any = {};
   positions: Array<{ id: number, photo: string }> = [];
   resultado: string = '';
-  sala: Sala;
-  listaSalas: Sala[] = [];
-  jugador1!: Jugador;
-  jugador2!: Jugador;
-  listPlayers: Jugador[] = [];
+  sala!: Sala;
+  player!: Jugador;
+  bot!: Jugador;
   docID: string = '';
   jugada: any = {};
   img: any[] = [];
   fichas: string[] = [];
-  soyJugadorUno: boolean = false;
-  habilitado: boolean = false;
+  habilitado: boolean = true;
 
   private searchEventSubscription: Subscription = new Subscription();
 
@@ -40,123 +36,18 @@ export class MemotestComponent implements OnInit {
     public _authService: AuthService,
     private route: Router,
     private _salaService: SalaService) {
-    this.sala = new Sala();
   }
 
   ngOnInit(): void {
-    this.init();
-    this.jugada.primerClick = false;
-    this.jugada.segundoClick = false;
-    this.jugada.idPrimerClick = '';
-    this.jugada.idSegundoClick = '';
-  }
-
-  init() {
-    if ((this._authService.user.token == null || this._authService.user.token == '')) {
-      this.route.navigate(['signin'])
-    } else {
-      this.searchEventSubscription =
-        this._salaService.getSalaPorJuego(this.juego)
-          .snapshotChanges()
-          .pipe(
-            map(changes =>
-              changes.map((c: any) => {
-                console.log('c', c)
-                this.docID = c.payload.doc.id;
-                return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-              }
-              )
-            )
-          )
-          .subscribe((doc: any) => {
-            console.log('doc', doc)
-            this.listaSalas = (doc) ? doc : [];
-
-            if (this.listaSalas.length == 0) {
-              this.sala = new Sala();
-              this.sala.nombreJuego = this.juego;
-              this.sala.ready = false;
-              this.jugador1 = new Jugador();
-              this.jugador1.email = this._authService.user.email;
-              this.jugador1.estadoJugada = false;
-              this.sala.id = uid();
-              this.jugador1.salaActual = this.sala.id;
-              this.jugador2 = new Jugador();
-              this.jugador2.estadoJugada = false;
-              this.sala.jugador1 = JSON.stringify(this.jugador1);
-              this.sala.jugador2 = JSON.stringify(this.jugador2);
-              this.buildBox();
-            } else {
-
-              var oSala = this.listaSalas.find((value: Sala) => {
-                this.jugador1 = JSON.parse(value.jugador1);
-                return (!(this.jugador1.email == undefined || this.jugador1.email == null))
-              })
-
-              if (oSala != undefined && oSala != null && this._authService.user.email != this.jugador1.email) {
-                this.sala = oSala;
-                this.sala.ready = true;
-                this.jugador2 = new Jugador();
-                this.jugador2.email = this._authService.user.email;
-                this.jugador2.estadoJugada = true;
-                this.jugador2.salaActual = this.sala.id;
-                this.listPlayers.push(this.jugador1);
-                this.listPlayers.push(this.jugador2);
-                this.sala.jugador1 = JSON.stringify(this.jugador1);
-                this.sala.jugador2 = JSON.stringify(this.jugador2);
-                console.log('sala', this.sala);
-                this._salaService.update(this.docID, this.sala);
-                this.setSala(this.sala)
-                this.searchEventSubscription.unsubscribe()
-                this.getMyRoom()
-              }
-            }
-          }
-          )
-    }
-  }
-
-  getMyRoom() {
-    this.searchEventSubscription =
-      this._salaService.getMiSalaPorJuego(this.juego)
-        .snapshotChanges()
-        .pipe(
-          map(changes =>
-            changes.map((c: any) => {
-              this.docID = c.payload.doc.id;
-              return ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-            }
-            )
-          )
-        )
-        .subscribe((doc: any) => {
-          if (doc[0]) {
-            this.sala.id = doc[0].id;
-            this.sala.nombreJuego = doc[0].nombreJuego;
-            this.sala.ready = doc[0].ready;
-            this.sala.finalizado = doc[0].finalizado;
-            this.sala.jugador1 = doc[0].jugador1;
-            this.sala.jugador2 = doc[0].jugador2;
-            //this.sala.chosen = doc[0].chosen;
-            this.sala.tablaMemo = doc[0].tablaMemo;
-            this.tablaMemo = this.sala.tablaMemo;
-            this.jugador1 = new Jugador();
-            this.jugador2 = new Jugador();
-            this.jugador1 = JSON.parse(doc[0].jugador1);
-            this.jugador2 = JSON.parse(doc[0].jugador2);
-            this.soyJugadorUno = this.soyJugador1();
-            this.habilitado = this.bEstadoJugada();
-          }
-        }
-        )
-  }
-
-  setSala(oSala: Sala) {
-    this.sala = oSala;
-  }
-
-  buildBox() {
-    console.log('buildBox')
+    this.sala = new Sala();
+    this.sala.nombreJuego = 'Memotest';
+    this.player = new Jugador();
+    this.bot = new Jugador();
+    this.player.email = this._authService.user.email;
+    this.player.estado = true;
+    this.sala.player = JSON.stringify(this.player);
+    this.sala.bot = JSON.stringify(this.bot);
+    //this.buildBox();
     this.tablaMemo.a1 = false;
     this.tablaMemo.a2 = false;
     this.tablaMemo.a3 = false;
@@ -186,8 +77,6 @@ export class MemotestComponent implements OnInit {
           this.positions[index] = { id: this.positions[index].id, photo: this.img[index - ((index < 6) ? 0 : 6)].strDrinkThumb }
         }
 
-        console.log('positions', this.positions)
-
         var old: number = -1;
         this.positions.forEach((element: any) => {
 
@@ -214,15 +103,96 @@ export class MemotestComponent implements OnInit {
         this.tablaMemo.fichas.c3 = this.fichas[10];
         this.tablaMemo.fichas.c4 = this.fichas[11];
 
-        this.tablaMemo.jugada = {};
+        this.tablaMemo.jugada = {
+          idPrimerClick: '', idSegundoClick: '', primerClick: false,
+          segundoClick: false, photoPrimerClick: '', photoSegundoClick: ''
+        };
+
         this.sala.tablaMemo = this.tablaMemo;
 
-        console.log('create', this.sala)
-        this._salaService.create(this.sala);
-        this.searchEventSubscription.unsubscribe()
-        this.getMyRoom()
-      });
+        if ((this._authService.user.token == null || this._authService.user.token == '')) {
+          this.route.navigate(['signin'])
+        } else {
+          this._salaService.create(this.sala).then((docRef) => {
+            this.docID = docRef.id;
+            this._salaService.getSalaById(this.docID)
+              .valueChanges()
+              .subscribe((doc: any) => {
+                this.sala = doc;
+                this.player = JSON.parse(this.sala.player);
+                this.bot = JSON.parse(this.sala.bot);
+                if (this.habilitado && this.bot.estado && !this.sala.tablaMemo.jugada.primerClick && !this.sala.tablaMemo.jugada.segundoClick && !this.sala.finalizado) this.setJugadaBot();
+              })
+          })
+        }
+      })
+  }
 
+  setJugadaBot() {
+    //this.tablaMemo.a4
+    //'b4$'+sala.tablaMemo.fichas.b4
+    let verify = false;
+    let cell = '';
+
+    for (let index = 0; index < 2; index++) {
+      do {
+        let option = Math.floor(Math.random() * 12) + 1;
+
+        switch (option) {
+          case 1:
+            verify = this.tablaMemo.a1;
+            cell = 'a1$' + this.sala.tablaMemo.fichas.a1;
+            break;
+          case 2:
+            verify = this.tablaMemo.a2;
+            cell = 'a2$' + this.sala.tablaMemo.fichas.a2;
+            break;
+          case 3:
+            verify = this.tablaMemo.a3;
+            cell = 'a3$' + this.sala.tablaMemo.fichas.a3;
+            break;
+          case 4:
+            verify = this.tablaMemo.a4;
+            cell = 'a4$' + this.sala.tablaMemo.fichas.a4;
+            break;
+          case 5:
+            verify = this.tablaMemo.b1;
+            cell = 'b1$' + this.sala.tablaMemo.fichas.b1;
+            break;
+          case 6:
+            verify = this.tablaMemo.b2;
+            cell = 'b2$' + this.sala.tablaMemo.fichas.b2;
+            break;
+          case 7:
+            verify = this.tablaMemo.b3;
+            cell = 'b3$' + this.sala.tablaMemo.fichas.b3;
+            break;
+          case 8:
+            verify = this.tablaMemo.b4;
+            cell = 'b4$' + this.sala.tablaMemo.fichas.b4;
+            break;
+          case 9:
+            verify = this.tablaMemo.c1;
+            cell = 'c1$' + this.sala.tablaMemo.fichas.c1;
+            break;
+          case 10:
+            verify = this.tablaMemo.c2;
+            cell = 'c2$' + this.sala.tablaMemo.fichas.c2;
+            break;
+          case 11:
+            verify = this.tablaMemo.c3;
+            cell = 'c3$' + this.sala.tablaMemo.fichas.c3;
+            break;
+          case 12:
+            verify = this.tablaMemo.c4;
+            cell = 'c4$' + this.sala.tablaMemo.fichas.c4;
+            break;
+          default:
+            break;
+        }
+      } while (verify);
+      this.pulsar(cell);
+    }
   }
 
   pulsar(drink: string) {
@@ -271,114 +241,128 @@ export class MemotestComponent implements OnInit {
     }
 
     if (!this.jugada.primerClick) {
-      //es el primer click
+      //primer click
       this.jugada.primerClick = !this.jugada.primerClick;
       this.jugada.idPrimerClick = drink.split('$')[0];
       this.jugada.photoPrimerClick = drink.split('$')[1];
+      this.tablaMemo.jugada = this.jugada;
+      this.sala.tablaMemo = this.tablaMemo;
       this.updateSala()
     } else {
+      //segundo click
+      this.habilitado = false;
+      let isPlayer = this.player.estado;
       this.jugada.segundoClick = !this.jugada.segundoClick;
       this.jugada.idSegundoClick = drink.split('$')[0];
       this.jugada.photoSegundoClick = drink.split('$')[1];
 
       if (this.jugada.photoPrimerClick == this.jugada.photoSegundoClick) {
         //acierto
-        this.soyJugador1() ? this.jugador1.puntosSesion++ : this.jugador2.puntosSesion++;
+        if(this.player.estado) {
+          this.player.puntosSesion += 1;
+        } else {
+          this.bot.puntosSesion += 1;
+        }
         this.sala.resultado = 'Match!!';
-        this.soyJugador1() ? this.jugador1.estadoJugada = false : this.jugador2.estadoJugada = false;
-        this.updateSala();
-      } else {
-        //desacierto
-        this.sala.resultado = 'No match';
-        this.soyJugador1() ? this.jugador1.estadoJugada = false : this.jugador2.estadoJugada = false;
+        this.sala.player = JSON.stringify(this.player);
+        this.sala.bot = JSON.stringify(this.bot);
+        this.jugada.idPrimerClick = '';
+        this.jugada.idSegundoClick = '';
+        
+        this.jugada.photoPrimerClick = '';
+        this.jugada.photoSegundoClick = '';
+        this.sala.resultado = (this.player.puntosSesion + this.bot.puntosSesion) == 6 ? (this.player.puntosSesion > this.bot.puntosSesion) ? 'Ganaste' : (this.player.puntosSesion < this.bot.puntosSesion) ? 'Perdiste' : 'Empate' : '';
+        this.sala.finalizado = ((this.player.puntosSesion + this.bot.puntosSesion) == 6);
+        if (this.sala.finalizado) {
+          if(this.player.puntosSesion > this.bot.puntosSesion){
+            this.player.score = Math.round(Math.abs((new Date().getTime() - new Date(this.sala.startDate).getTime()) / 1000));
+            this.sala.player = JSON.stringify(this.player);
+          }
+        }
+        this.tablaMemo.jugada = this.jugada;
+        this.sala.tablaMemo = this.tablaMemo;
         this.updateSala();
 
         setTimeout(() => {
-          console.log('timeout')
-          //habilito a jugar al rival
-          this.soyJugador1() ? this.jugador2.estadoJugada = true : this.jugador1.estadoJugada = true;
-          this.sala.resultado = '';
-          
-          //vuelvo atras la jugada
-          for (let index = 0; index < 2; index++) {
-            switch (index === 0 ? drink.split('$')[0] : this.jugada.idPrimerClick) {
-              case 'a1':
-                this.tablaMemo.a1 = false;
-                break;
-              case 'a2':
-                this.tablaMemo.a2 = false;
-                break;
-              case 'a3':
-                this.tablaMemo.a3 = false;
-                break;
-              case 'a4':
-                this.tablaMemo.a4 = false;
-                break;
-              case 'b1':
-                this.tablaMemo.b1 = false;
-                break;
-              case 'b2':
-                this.tablaMemo.b2 = false;
-                break;
-              case 'b3':
-                this.tablaMemo.b3 = false;
-                break;
-              case 'b4':
-                this.tablaMemo.b4 = false;
-                break;
-              case 'c1':
-                this.tablaMemo.c1 = false;
-                break;
-              case 'c2':
-                this.tablaMemo.c2 = false;
-                break;
-              case 'c3':
-                this.tablaMemo.c3 = false;
-                break;
-              case 'c4':
-                this.tablaMemo.c4 = false;
-                break;
-              default:
-                break;
-            }
+          this.jugada.primerClick = false;
+          this.jugada.segundoClick = false;
+          this.tablaMemo.jugada = this.jugada;
+          this.sala.tablaMemo = this.tablaMemo;
+          this.updateSala();
+          this.habilitado = true;          
+        }, 2000);
+      } else {
+        //desacierto
+        this.sala.resultado = 'Not match';
 
+        setTimeout(() => {
+          //vuelvo atras la jugada
+        for (let index = 0; index < 2; index++) {
+          switch (index === 0 ? this.jugada.idPrimerClick : this.jugada.idSegundoClick) {
+            case 'a1':
+              this.tablaMemo.a1 = false;
+              break;
+            case 'a2':
+              this.tablaMemo.a2 = false;
+              break;
+            case 'a3':
+              this.tablaMemo.a3 = false;
+              break;
+            case 'a4':
+              this.tablaMemo.a4 = false;
+              break;
+            case 'b1':
+              this.tablaMemo.b1 = false;
+              break;
+            case 'b2':
+              this.tablaMemo.b2 = false;
+              break;
+            case 'b3':
+              this.tablaMemo.b3 = false;
+              break;
+            case 'b4':
+              this.tablaMemo.b4 = false;
+              break;
+            case 'c1':
+              this.tablaMemo.c1 = false;
+              break;
+            case 'c2':
+              this.tablaMemo.c2 = false;
+              break;
+            case 'c3':
+              this.tablaMemo.c3 = false;
+              break;
+            case 'c4':
+              this.tablaMemo.c4 = false;
+              break;
+            default:
+              break;
           }
+        }
+
+          this.habilitado = true;
+          this.sala.tablaMemo = this.tablaMemo;
+          this.player.estado = !isPlayer;
+          this.bot.estado = isPlayer;
           this.jugada.idPrimerClick = '';
           this.jugada.idSegundoClick = '';
           this.jugada.primerClick = false;
           this.jugada.segundoClick = false;
           this.jugada.photoPrimerClick = '';
           this.jugada.photoSegundoClick = '';
+          this.tablaMemo.jugada = this.jugada;
+          this.sala.resultado = '';
           this.updateSala()
         }, 2000);
       }
     }
-
-  }
-
-  soyJugador1(): boolean {
-    return (this._authService.user.email == this.jugador1.email)
-  }
-
-  bEstadoJugada(): boolean {
-    return this.soyJugador1() ? this.jugador1.estadoJugada : this.jugador2.estadoJugada;
-  }
-
-  setearJugada() {
-    if (this.soyJugador1()) {
-      this.jugador1.estadoJugada = !this.jugador1.estadoJugada;
-    } else {
-      this.jugador2.estadoJugada = !this.jugador2.estadoJugada;
-    }
   }
 
   updateSala() {
-    this.sala.jugador1 = JSON.stringify(this.jugador1);
-    this.sala.jugador2 = JSON.stringify(this.jugador2);
+    this.sala.player = JSON.stringify(this.player);
+    this.sala.bot = JSON.stringify(this.bot);
     this.tablaMemo.jugada = this.jugada;
     this.sala.tablaMemo = this.tablaMemo;
-    console.log(this.docID)
-    console.log( Object.assign({}, this.sala))
     this._salaService.update(this.docID, Object.assign({}, this.sala));
   }
 }

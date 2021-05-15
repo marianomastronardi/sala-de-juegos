@@ -4,42 +4,42 @@
         <a class="btn btn-outline-success mt-2 mb-5 mr-5 ml-5" [routerLink]="'/survey'">Ir a Encuesta</a><br>
     </div>
 
-    <div *ngIf="!sala.chosen">
+    <div *ngIf="!player.chosen">
         <p>Elija con que jugar</p><button class="btn btn-outline-primary" (click)="elegirOpcion('x')">X</button><button class="btn btn-outline-primary" (click)="elegirOpcion('o')">O</button>
     </div>
-    <table class="table table-bordered border-dark w-auto" *ngIf="sala.chosen">
+    <table class="table table-bordered border-dark w-auto" *ngIf="player.chosen">
         <tbody>
             <tr>
                 <td><img *ngIf="sala.tabla.a1.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.a1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a1')" *ngIf="!sala.tabla.a1.x && !sala.tabla.a1.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.a1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('a1')" *ngIf="!sala.tabla.a1.x && !sala.tabla.a1.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.a2.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.a2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a2')" *ngIf="!sala.tabla.a2.x && !sala.tabla.a2.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.a2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('a2')" *ngIf="!sala.tabla.a2.x && !sala.tabla.a2.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.a3.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.a3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('a3')" *ngIf="!sala.tabla.a3.x && !sala.tabla.a3.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.a3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('a3')" *ngIf="!sala.tabla.a3.x && !sala.tabla.a3.o">Pulsar</button>
                 </td>
             </tr>
             <tr>
                 <td><img *ngIf="sala.tabla.b1.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.b1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b1')" *ngIf="!sala.tabla.b1.x && !sala.tabla.b1.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.b1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('b1')" *ngIf="!sala.tabla.b1.x && !sala.tabla.b1.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.b2.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.b2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b2')" *ngIf="!sala.tabla.b2.x && !sala.tabla.b2.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.b2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('b2')" *ngIf="!sala.tabla.b2.x && !sala.tabla.b2.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.b3.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.b3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('b3')" *ngIf="!sala.tabla.b3.x && !sala.tabla.b3.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.b3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('b3')" *ngIf="!sala.tabla.b3.x && !sala.tabla.b3.o">Pulsar</button>
                 </td>
             </tr>
             <tr>
                 <td><img *ngIf="sala.tabla.c1.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.c1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c1')" *ngIf="!sala.tabla.c1.x && !sala.tabla.c1.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.c1.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('c1')" *ngIf="!sala.tabla.c1.x && !sala.tabla.c1.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.c2.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.c2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c2')" *ngIf="!sala.tabla.c2.x && !sala.tabla.c2.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.c2.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('c2')" *ngIf="!sala.tabla.c2.x && !sala.tabla.c2.o">Pulsar</button>
                 </td>
                 <td><img *ngIf="sala.tabla.c3.x" src="../../../../assets/X.jpg" alt="">
-                    <img *ngIf="sala.tabla.c3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="habilitado" (click)="pulsar('c3')" *ngIf="!sala.tabla.c3.x && !sala.tabla.c3.o">Pulsar</button>
+                    <img *ngIf="sala.tabla.c3.o" src="../../../../assets/O.jpg" alt=""><button class="btn btn-outline-success" [disabled]="!player.estado" (click)="pulsar('c3')" *ngIf="!sala.tabla.c3.x && !sala.tabla.c3.o">Pulsar</button>
                 </td>
             </tr>
         </tbody>
@@ -48,4 +48,4 @@
         {{ resultado }}
     </div>
 </div>
-<app-chat-firestore [juego]="juego"></app-chat-firestore>
+<app-chat-firestore [juego]="sala.nombreJuego"></app-chat-firestore>

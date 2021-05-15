@@ -1,0 +1,37 @@
+<div class="nav-scroller bg-white shadow-sm mt-1">
+    <nav class="nav nav-underline">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (click)="choose($event)" name="rbJuego" id="PiedraPapelOTijera" value="PiedraPapelOTijera" checked>
+            <label class="form-check-label" for="PiedraPapelOTijera">Piedra Papel o Tijera</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (click)="choose($event)" name="rbJuego" id="TaTeTi" value="TaTeTi">
+            <label class="form-check-label" for="TaTeTi">Ta Te Ti</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (click)="choose($event)" name="rbJuego" id="MemoTest" value="Memotest">
+            <label class="form-check-label" for="MemoTest">MemoTest</label>
+        </div>
+    </nav>
+</div>
+
+<div class="alert alert-primary mb-5 mt-1" role="alert">
+    <h5>Los mejores resultados son aquellos <strong>que son mas pequeños</strong> porque el jugador ganó su partida en el mejor tiempo posible.</h5>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Usuario</th>
+            <th scope="col">Puntos</th>
+        </tr>
+    </thead>
+    <tbody *ngFor="let score of scores; let i=index">
+        <tr>
+            <th scope="row">{{ i + 1}}</th>
+            <td>{{ score.email }}</td>
+            <td>{{ score.score }}</td>
+        </tr>
+    </tbody>
+</table>

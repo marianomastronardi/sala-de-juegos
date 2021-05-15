@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, DocumentReference } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Sala } from "../models/sala";
 
@@ -20,7 +20,7 @@ export class SalaService {
     return this.SalaRef;
   }
 
-  create(sala: Sala): any {
+  create(sala: Sala): Promise<DocumentReference<Sala>> {
     return this.SalaRef.add({ ...sala });
   }
 
@@ -32,11 +32,19 @@ export class SalaService {
     return this.SalaRef.doc(id).delete();
   }
 
+  getSalaById(id:string){
+    return  this.SalaRef.doc(id); //this.db.collection(this.dbPath, ref => ref.where('id', '==', id));
+  }
+
   getSalaPorJuego(juego:string){
     return  this.db.collection(this.dbPath, ref => ref.where('nombreJuego', '==', juego).where('ready', '==', false).limit(1));
   }
 
   getMiSalaPorJuego(juego:string){
     return  this.db.collection(this.dbPath, ref => ref.where('nombreJuego', '==', juego).where('ready', '==', true).where('finalizado', '==', false).limit(1));
+  }
+
+  getScoresByGame(juego:string){
+    return  this.db.collection(this.dbPath, ref => ref.where('nombreJuego', '==', juego).where('finalizado', '==', true));
   }
 }
